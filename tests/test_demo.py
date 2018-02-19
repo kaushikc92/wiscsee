@@ -12,6 +12,7 @@ from config_helper import rule_parameter
 from pyreuse.helpers import shcmd
 from config_helper import experiment
 
+import pdb
 
 class Test_TraceOnly(unittest.TestCase):
     def test_run(self):
@@ -222,6 +223,27 @@ class TestUniformDataLifetime(unittest.TestCase):
         obj = LocalExperiment( Parameters(**para) )
         obj.main()
 
+class TestLinuxDdReqscaleAndDataLifetime(unittest.TestCase):
+    def test_run(self):
+        class LocalExperiment(experiment.Experiment):
+            def setup_workload(self):
+                self.conf['workload_class'] = "LinuxDdWrite"
+
+        para = experiment.get_shared_nolist_para_dict(expname="linux-dd-exp",
+                                                      lbabytes=1024*MB)
+        para.update(
+            {
+                'device_path': "/dev/sdc1",
+                'ftl' : 'ftlcounter',
+                'enable_simulation': True,
+                'dump_ext4_after_workload': True,
+                'only_get_traffic': False,
+                'trace_issue_and_complete': True,
+            })
+
+        Parameters = collections.namedtuple("Parameters", ','.join(para.keys()))
+        obj = LocalExperiment( Parameters(**para) )
+        obj.main()
 
 # class Test_TraceAndSimulateLinuxDD(unittest.TestCase):
     # def test_run(self):
@@ -239,5 +261,6 @@ class TestUniformDataLifetime(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    pdb.set_trace()
     unittest.main()
 
