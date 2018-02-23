@@ -245,6 +245,55 @@ class TestLinuxDdReqscaleAndDataLifetime(unittest.TestCase):
         obj = LocalExperiment( Parameters(**para) )
         obj.main()
 
+class TestLinuxDdLocality(unittest.TestCase):
+    def test(self):
+        for para in rule_parameter.ParaDict(expname="linux-dd-locality", trace_expnames=['linux-dd-exp'], rule="locality"):
+            experiment.execute_simulation(para)
+
+class TestScaleGood(unittest.TestCase):
+    def test_run(self):
+        class LocalExperiment(experiment.Experiment):
+            def setup_workload(self):
+                self.conf['workload_class'] = "ScaleGood"
+
+        para = experiment.get_shared_nolist_para_dict(expname="scale-good-exp",
+                                                      lbabytes=1024*MB)
+        para.update(
+            {
+                'device_path': "/dev/sdc1",
+                'ftl' : 'ftlcounter',
+                'enable_simulation': True,
+                'dump_ext4_after_workload': True,
+                'only_get_traffic': False,
+                'trace_issue_and_complete': True,
+            })
+
+        Parameters = collections.namedtuple("Parameters", ','.join(para.keys()))
+        obj = LocalExperiment( Parameters(**para) )
+        obj.main()
+
+class TestScaleBad(unittest.TestCase):
+    def test_run(self):
+        class LocalExperiment(experiment.Experiment):
+            def setup_workload(self):
+                self.conf['workload_class'] = "ScaleBad"
+
+        para = experiment.get_shared_nolist_para_dict(expname="scale-bad-exp",
+                                                      lbabytes=1024*MB)
+        para.update(
+            {
+                'device_path': "/dev/sdc1",
+                'ftl' : 'ftlcounter',
+                'enable_simulation': True,
+                'dump_ext4_after_workload': True,
+                'only_get_traffic': False,
+                'trace_issue_and_complete': True,
+            })
+
+        Parameters = collections.namedtuple("Parameters", ','.join(para.keys()))
+        obj = LocalExperiment( Parameters(**para) )
+        obj.main()
+
 # class Test_TraceAndSimulateLinuxDD(unittest.TestCase):
     # def test_run(self):
         # class LocalExperiment(experiment.Experiment):
@@ -261,6 +310,5 @@ class TestLinuxDdReqscaleAndDataLifetime(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    pdb.set_trace()
     unittest.main()
 

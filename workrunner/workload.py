@@ -99,6 +99,56 @@ class LinuxDdWrite(Workload):
     def stop(self):
         pass
 
+class ScaleBad(Workload):
+    def __init__(self, confobj, workload_conf_key = None):
+        super(ScaleBad, self).__init__(confobj, workload_conf_key)
+
+    def run(self):
+        mnt = self.conf["fs_mount_point"]
+        datafile = os.path.join(mnt, "datafile")
+        region = 8 * MB
+        chunksize = 64 * KB
+        n_chunks = region / chunksize
+        chunkids = range(n_chunks)
+
+        buf = "a" * chunksize
+        f = open(datafile, "w+")
+        random.shuffle(chunkids)
+        for chunkid in chunkids:
+            offset = chunkid * chunksize
+            f.seek(offset)
+            f.write(buf)
+            os.fsync(f)
+        f.close()
+
+    def stop(self):
+        pass
+
+class ScaleGood(Workload):
+    def __init__(self, confobj, workload_conf_key = None):
+        super(ScaleGood, self).__init__(confobj, workload_conf_key)
+
+    def run(self):
+        mnt = self.conf["fs_mount_point"]
+        datafile = os.path.join(mnt, "datafile")
+        region = 8 * MB
+        chunksize = 64 * KB
+        n_chunks = region / chunksize
+        chunkids = range(n_chunks)
+
+        buf = "a" * chunksize
+        f = open(datafile, "w+")
+        random.shuffle(chunkids)
+        for chunkid in chunkids:
+            offset = chunkid * chunksize
+            f.seek(offset)
+            f.write(buf)
+            #os.fsync(f)
+        f.close()
+
+    def stop(self):
+        pass
+
 # class LinuxDdWrite(Workload):
 #	def __init__(self, confobj, workload_conf_key = None):
 #		super(LinuxDdWrite, self).__init__(confobj, workload_conf_key)
